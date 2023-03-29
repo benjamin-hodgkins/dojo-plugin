@@ -6,7 +6,6 @@ class Input
     int prevRaceTime = -6666;
     int currentRaceTime = -6666;
     int latestRecordedTime = -6666;
-    CTrackManiaNetwork@ network;
 
     array<uint> sectorTimes;
     uint respawns;
@@ -19,24 +18,6 @@ class Input
     // Idle detection
     vec3 latestPlayerPosition;
     int numSamePositions = 0;
-
-    // Server status
-    bool serverAvailable = false;
-    bool checkingServer = false;
-
-    // Session
-    int checkSessionIdCount = 0;
-    int maxCheckSessionId = 60;
-
-    // Plugin info
-    Meta::Plugin@ plugin = Meta::ExecutingPlugin();
-    string version = plugin.Version;
-
-    string pluginAuthUrl = "";
-
-    bool pluginAuthed = false;
-    bool isAuthenticating = false;
-    bool authWindowOpened = false;
 
     Input() {
         auto app = GetApp();
@@ -112,11 +93,6 @@ class Input
 
     void Update(float dt)
 	{
-        // Do not start recording if the user is not authenticated or doesn't even have a SessionId
-        if (!pluginAuthed || SessionId == "") {
-            return;
-        }
-
 
 		auto app = GetApp();
 
