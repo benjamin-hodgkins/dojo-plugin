@@ -91,6 +91,6 @@ class Input
         //game_input.Reset();
 
         FillBuffer(vis);
-
+        
 	}
 }

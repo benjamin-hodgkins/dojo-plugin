@@ -1,6 +1,7 @@
 TMDojo@ game_input;
 
 void Main() {
+    print("Hello, world")
     @game_input = Input();
 }
 
@@ -11,9 +12,6 @@ void Update(float dt) {
 }
 
 void RenderInterface() {
-    if (game_input.authWindowOpened) {
-        renderAuthWindow();
-    }
     if (DebugOverlayEnabled) {
         renderDebugOverlay();
     }

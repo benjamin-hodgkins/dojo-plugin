@@ -1,13 +1,13 @@
-# TMDojo Plugin
+# Inputs Plugin
 
-This is the Openplanet plugin for TMDojo.
+This plugin obtains the players current state and outputs it to a text file.
 
-It records telemetry data when playing the game, which gets uploaded to our API.
 
 The data is obtained using [Openplanet's CSceneVehicleVisState](https://next.openplanet.nl/Scene/CSceneVehicleVisState).
 
 ## Data format
 
+(Take from https://github.com/tm-dojo/plugin)
 The plugin creates a "sample" 60 times a second.
 The samples are added into a binary buffer.
 Each sample contains 23 values for a total of 112 bytes.
