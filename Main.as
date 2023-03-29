@@ -1,20 +1,17 @@
-TMDojo@ g_dojo;
+TMDojo@ game_input;
 
 void Main() {
-    @g_dojo = TMDojo();
-    print("TMDojo v" + g_dojo.version + " Init ");
+    @game_input = Input();
 }
 
 void Update(float dt) {
-    if (g_dojo !is null && Enabled) {
-		g_dojo.Update(dt);
+    if (game_input !is null && Enabled) {
+		game_input.Update(dt);
 	}
-    
-    DependencyNotifier::NotifyMissingPlayerStateDependency();
 }
 
 void RenderInterface() {
-    if (g_dojo.authWindowOpened) {
+    if (game_input.authWindowOpened) {
         renderAuthWindow();
     }
     if (DebugOverlayEnabled) {

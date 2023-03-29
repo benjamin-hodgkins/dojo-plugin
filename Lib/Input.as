@@ -1,4 +1,4 @@
-class TMDojo
+class Input
 {
     bool recording = false;
     MemoryBuffer membuff = MemoryBuffer(0);
@@ -38,19 +38,19 @@ class TMDojo
     bool isAuthenticating = false;
     bool authWindowOpened = false;
 
-    TMDojo() {
+    Input() {
         auto app = GetApp();
         @network = cast<CTrackManiaNetwork>(app.Network);
         startnew(Api::checkServerWaitForValidWebId);
     }
 
     void Reset() {
-        // Reset recording state, all data required to upload is available without the need of TMDojo instance
-        g_dojo.recording = false;
-        g_dojo.latestRecordedTime = -6666;
-        g_dojo.currentRaceTime = -6666;
-        g_dojo.membuff.Resize(0);
-        g_dojo.sectorTimes.Resize(0);
+        // Reset recording state
+        game_input.recording = false;
+        game_input.latestRecordedTime = -6666;
+        game_input.currentRaceTime = -6666;
+        game_input.membuff.Resize(0);
+        game_input.sectorTimes.Resize(0);
     }
 
     void FillBuffer(CSceneVehicleVisState@ vis) {
@@ -61,7 +61,7 @@ class TMDojo
         gazAndBrake |= gazPedal;
         gazAndBrake |= isBraking;
 
-        membuff.Write(g_dojo.currentRaceTime);
+        membuff.Write(game_input.currentRaceTime);
 
         membuff.Write(vis.Position.x);
         membuff.Write(vis.Position.y);
@@ -116,18 +116,6 @@ class TMDojo
         if (!pluginAuthed || SessionId == "") {
             return;
         }
-        
-#if DEPENDENCY_PLAYERSTATE
-        // Track CP times
-        PlayerState::sTMData@ TMData = PlayerState::GetRaceData();
-        if(TMData.dEventInfo.CheckpointChange && 
-            TMData.dPlayerInfo.NumberOfCheckpointsPassed < uint(TMData.dMapInfo.NumberOfCheckpoints + 1)) {
-            sectorTimes.InsertLast(TMData.dPlayerInfo.LatestCPTime);
-        }
-        if(TMData.dEventInfo.PlayerStateChange && TMData.PlayerState == PlayerState::EPlayerState::EPlayerState_Countdown) {
-            sectorTimes.Resize(0);
-        }
-#endif
 
 
 		auto app = GetApp();
@@ -180,11 +168,11 @@ class TMDojo
                 if (@app.Network.PlaygroundClientScriptAPI != null) {
                     auto playgroundClientScriptAPI = cast<CGamePlaygroundClientScriptAPI>(app.Network.PlaygroundClientScriptAPI);
                     if (@playgroundClientScriptAPI != null) {
-                        g_dojo.currentRaceTime = playgroundClientScriptAPI.GameTime - smScript.StartTime;
+                        game_input.currentRaceTime = playgroundClientScriptAPI.GameTime - smScript.StartTime;
                     }
                 }
             } else {
-                g_dojo.currentRaceTime = smScript.CurrentRaceTime;
+                game_input.currentRaceTime = smScript.CurrentRaceTime;
             }
         }
 
@@ -198,7 +186,7 @@ class TMDojo
             drawRecordingOverlay();
         }
 
-        if (!recording && g_dojo.currentRaceTime > -200 && g_dojo.currentRaceTime < 0) {
+        if (!recording && game_input.currentRaceTime > -200 && game_input.currentRaceTime < 0) {
             recording = true;
         }
 
@@ -206,7 +194,7 @@ class TMDojo
             
             if (uiConfig.UISequence == 11) {
                 // Finished track
-                print("[TMDojo]: Finished");
+                print("[Input]: Finished");
 
                 FinishHandle@ finishHandle = cast<FinishHandle>(FinishHandle());
                 finishHandle.finished = true;
@@ -240,11 +228,11 @@ class TMDojo
                 }
 
                 startnew(Api::PostRecordedData, finishHandle);
-            } else if (latestRecordedTime > 0 && g_dojo.currentRaceTime < 0) {
+            } else if (latestRecordedTime > 0 && game_input.currentRaceTime < 0) {
                 // Give up
-                print("[TMDojo]: Give up");
+                print("[Input]: Give up");
 
-                g_dojo.Reset();
+                game_input.Reset();
 
                 /*
                 FinishHandle@ finishHandle = cast<FinishHandle>(FinishHandle());
@@ -261,7 +249,7 @@ class TMDojo
                 */
             } else {
                  // Record current data
-                int timeSinceLastRecord = g_dojo.currentRaceTime - latestRecordedTime;
+                int timeSinceLastRecord = game_input.currentRaceTime - latestRecordedTime;
                 if (timeSinceLastRecord > (1.0 / RECORDING_FPS) * 1000) {
                     // Keep track of the amount of samples for which the position did not changed, used to pause recording
                     if (Math::Abs(latestPlayerPosition.x - smScript.Position.x) < 0.001 &&
@@ -274,7 +262,7 @@ class TMDojo
                     // Fill buffer if player has moved recently
                     if (numSamePositions < RECORDING_FPS) {
                         FillBuffer(vis);
-                        latestRecordedTime = g_dojo.currentRaceTime;
+                        latestRecordedTime = game_input.currentRaceTime;
                     }
 
                     latestPlayerPosition = smScript.Position;

@@ -1,9 +1,7 @@
 [meta]
-name = "TMDojo"
-author = "TeamDojo"
+name = "Inputs"
+author = "Perceptron"
 category = "Utilities"
-version = "0.6.0"
-siteid = 180
 
 [script]
 dependencies = [ "VehicleState" ]
