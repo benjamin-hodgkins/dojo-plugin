@@ -1,15 +1,10 @@
-@@ -1,63 +0,0 @@
 void renderDebugOverlay() {
-    UI::SetNextWindowContentSize(780, 230);
-    UI::Begin("TMDojo Debug", DebugOverlayEnabled);
+    UI::SetNextWindowContentSize(600, 230);
+    UI::Begin("Inputs Debug", DebugOverlayEnabled);
 
 
     UI::Columns(2);
-
-    UI::Text("Recording: " + g_dojo.recording);
-    UI::Text("CurrentRaceTime: " + g_dojo.currentRaceTime);
-    UI::Text("LatestRecordedTime: " + g_dojo.latestRecordedTime);
-    UI::Text("Buffer Size (bytes): " + g_dojo.membuff.GetSize());
+    UI::Text("Buffer Size (bytes): " + game_input.membuff.GetSize());
 
     CSceneVehicleVisState@ visState = VehicleState::ViewingPlayerState();
 
