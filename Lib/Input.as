@@ -22,6 +22,18 @@ class Input
 
     }
 
+    //TODO Output buffer to file
+    void Output(string fileName, uint64 bufSize) {
+        IO::File f;
+        // Open the file in 'read' mode
+        if(f.open(filename, "w") >= 0) {
+            // Write the buffer into a file
+            string data = game_input.membuff.ReadToString(bufSize);
+            f.write(data);
+            f.close();
+        }
+    }
+
     void FillBuffer(CSceneVehicleVisState@ vis) {
         int gazAndBrake = 0;
         int gazPedal = vis.InputGasPedal > 0 ? 1 : 0;
@@ -106,7 +118,7 @@ class Input
 
         //Time detection
         auto playgroundScript = cast<CSmArenaRulesMode>(app.PlaygroundScript);
-        
+
         if (app.CurrentPlayground !is null && app.CurrentPlayground.Interface !is null) {
             if (@playgroundScript == null) {
                 if (@app.Network.PlaygroundClientScriptAPI != null) {
@@ -120,7 +132,7 @@ class Input
             }
         }
 
-        //Condtions for resetting, finishing and otherwise
+        //Conditions for resetting, finishing and otherwise
 
         //Finish
         if (uiConfig.UISequence == 11) {
@@ -138,9 +150,11 @@ class Input
                     } else endRaceTimeAccurate = -1;
                 } else endRaceTimeAccurate = -1;
             } else endRaceTimeAccurate = -1;
+
+            game_input.Output("test.txt", membuff.GetSize()); //TODO Check to make sure call works
         }
 
-        // Give up
+        //Give up
          else if (latestRecordedTime > 0 && game_input.currentRaceTime < 0) {
             game_input.Reset();
         }
@@ -157,7 +171,7 @@ class Input
                 } else {
                     numSamePositions = 0;
                 }
-                // TODO Fill buffer if player has moved recently
+                //Fill buffer if player has moved recently
                 if (numSamePositions < RECORDING_FPS) {
                     FillBuffer(vis);
                     latestRecordedTime = game_input.currentRaceTime;
