@@ -95,7 +95,7 @@ class Input
 			return;
 		}
 
-        //Detects states for
+        //Detects states for later
         CSmPlayer@ smPlayer = cast<CSmPlayer>(app.CurrentPlayground.GameTerminals[0].GUIPlayer);
         CSmScriptPlayer@ smScript = cast<CSmScriptPlayer>(smPlayer.ScriptAPI);
         CGamePlaygroundUIConfig@ uiConfig = app.CurrentPlayground.UIConfigs[0];
@@ -104,10 +104,27 @@ class Input
             return;
         }
 
+        //Time detection
+        auto playgroundScript = cast<CSmArenaRulesMode>(app.PlaygroundScript);
+        
+        if (app.CurrentPlayground !is null && app.CurrentPlayground.Interface !is null) {
+            if (@playgroundScript == null) {
+                if (@app.Network.PlaygroundClientScriptAPI != null) {
+                    auto playgroundClientScriptAPI = cast<CGamePlaygroundClientScriptAPI>(app.Network.PlaygroundClientScriptAPI);
+                    if (@playgroundClientScriptAPI != null) {
+                        game_input.currentRaceTime = playgroundClientScriptAPI.GameTime - smScript.StartTime;
+                    }
+                }
+            } else {
+                game_input.currentRaceTime = smScript.CurrentRaceTime;
+            }
+        }
+
         //Condtions for resetting, finishing and otherwise
 
         //Finish
         if (uiConfig.UISequence == 11) {
+            print("Finished!");
             int endRaceTimeAccurate = -1;
             CSmArenaRulesMode@ PlaygroundScript = cast<CSmArenaRulesMode>(app.PlaygroundScript);
 
@@ -127,8 +144,9 @@ class Input
          else if (latestRecordedTime > 0 && game_input.currentRaceTime < 0) {
             game_input.Reset();
         }
-        //TODO Record current data
+        //Record current data
          else {
+            
             int timeSinceLastRecord = game_input.currentRaceTime - latestRecordedTime;
             if (timeSinceLastRecord > (1.0 / RECORDING_FPS) * 1000) {
                 // Keep track of the amount of samples for which the position did not changed, used to pause recording
@@ -139,7 +157,7 @@ class Input
                 } else {
                     numSamePositions = 0;
                 }
-                // Fill buffer if player has moved recently
+                // TODO Fill buffer if player has moved recently
                 if (numSamePositions < RECORDING_FPS) {
                     FillBuffer(vis);
                     latestRecordedTime = game_input.currentRaceTime;
